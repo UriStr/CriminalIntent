@@ -7,6 +7,7 @@ public class Crime {
 
     private UUID mId;
     private String mTitle;
+    private String mDescription;
     private Date mDate;
     private boolean mSolved;
 
@@ -42,5 +43,13 @@ public class Crime {
 
     public void setSolved(boolean solved) {
         mSolved = solved;
+    }
+
+    public String getDescription() {
+        return mDescription;
+    }
+
+    public void setDescription(String description) {
+        mDescription = description;
     }
 }

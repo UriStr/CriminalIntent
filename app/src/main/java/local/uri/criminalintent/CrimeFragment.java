@@ -24,6 +24,7 @@ public class CrimeFragment extends Fragment {
 
     private Crime mCrime;
     private EditText mTitleField;
+    private EditText mDescField;
     private Button mDataButton;
     private CheckBox mSolvedCheckBox;
 
@@ -61,6 +62,25 @@ public class CrimeFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 mCrime.setTitle(charSequence.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
+        mDescField = (EditText) v.findViewById(R.id.crime_details);
+        mDescField.setText(mCrime.getDescription());
+        mDescField.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                mCrime.setDescription(charSequence.toString());
             }
 
             @Override
