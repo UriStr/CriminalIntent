@@ -1,10 +1,12 @@
 package local.uri.criminalintent;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
@@ -20,7 +22,9 @@ import java.util.UUID;
 
 public class CrimeFragment extends Fragment {
 
-    public static final String ARG_CRIME_ID = "crimeId";
+    private static final String ARG_CRIME_ID = "crimeId";
+    private static final String DIALOG_DATE = "DialogDate";
+    private static final int REQUEST_DATE = 0;
 
     private Crime mCrime;
     private EditText mTitleField;
@@ -45,6 +49,8 @@ public class CrimeFragment extends Fragment {
         UUID crimeId = (UUID) getArguments().getSerializable(ARG_CRIME_ID);
         mCrime = CrimeLab.get(getActivity()).getCrime(crimeId);
     }
+
+
 
     @Nullable
     @Override
@@ -87,11 +93,20 @@ public class CrimeFragment extends Fragment {
             public void afterTextChanged(Editable editable) {
 
             }
-        });
+        }); ghbhfyjcjfhudyhcnhjjdufjuhj
 
         mDataButton = (Button) v.findViewById(R.id.crime_date);
         mDataButton.setText(DateFormat.format("dd-MM-yy, HH:mm:ss, EEE", mCrime.getDate()));
-        mDataButton.setEnabled(false);
+        //mDataButton.setEnabled(false);
+        mDataButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FragmentManager fragmentManager = getFragmentManager();
+                DatePickerfragment dialog = DatePickerfragment.newInstance(mCrime.getDate());
+                dialog.setTargetFragment(CrimeFragment.this, REQUEST_DATE);
+                dialog.show(fragmentManager, DIALOG_DATE);
+            }
+        });
 
         mSolvedCheckBox = (CheckBox) v.findViewById(R.id.crime_solved);
         mSolvedCheckBox.setChecked(mCrime.isSolved());
@@ -105,4 +120,5 @@ public class CrimeFragment extends Fragment {
 
         return v;
     }
+
 }
