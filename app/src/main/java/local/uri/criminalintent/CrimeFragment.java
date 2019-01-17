@@ -3,7 +3,6 @@ package local.uri.criminalintent;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.CalendarContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -19,8 +18,8 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 
+import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 import java.util.UUID;
 
 public class CrimeFragment extends Fragment {
@@ -29,7 +28,7 @@ public class CrimeFragment extends Fragment {
     private static final String DIALOG_DATE = "DialogDate";
     private static final String DIALOG_TIME = "DialogTime";
     private static final int REQUEST_DATE = 0;
-    private static final int REQUEST_TIME = 0;
+    private static final int REQUEST_TIME = 1;
 
     private Crime mCrime;
     private EditText mTitleField;
@@ -55,7 +54,6 @@ public class CrimeFragment extends Fragment {
         UUID crimeId = (UUID) getArguments().getSerializable(ARG_CRIME_ID);
         mCrime = CrimeLab.get(getActivity()).getCrime(crimeId);
     }
-
 
 
     @Nullable
@@ -119,7 +117,8 @@ public class CrimeFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 FragmentManager fragmentManager = getFragmentManager();
-                TimePickerFragment dialog = new TimePickerFragment();
+                TimePickerFragment dialog = TimePickerFragment.newInstance(mCrime.getDate());
+                dialog.setTargetFragment(CrimeFragment.this, REQUEST_TIME);
                 dialog.show(fragmentManager, DIALOG_TIME);
             }
         });
@@ -150,6 +149,16 @@ public class CrimeFragment extends Fragment {
         if (requestCode == REQUEST_DATE) {
             Date date = (Date) data.getSerializableExtra(DatePickerfragment.EXTRA_DATE);
             mCrime.setDate(date);
+            updateDate();
+        }
+
+        if (requestCode == REQUEST_TIME) {
+            int[] time = data.getIntArrayExtra(TimePickerFragment.EXTRA_TIME);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(mCrime.getDate());
+            calendar.set(Calendar.HOUR_OF_DAY, time[0]);
+            calendar.set(Calendar.MINUTE, time[1]);
+            mCrime.setDate(calendar.getTime());
             updateDate();
         }
     }
