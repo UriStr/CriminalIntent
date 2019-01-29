@@ -36,7 +36,7 @@ public class CrimeFragment extends Fragment {
     private Button mDataButton;
     private Button mTimeButton;
     private CheckBox mSolvedCheckBox;
-
+    private Button mRemoveCrime;
 
     public static CrimeFragment newInstance(UUID crimeId) {
         Bundle args = new Bundle();
@@ -120,6 +120,15 @@ public class CrimeFragment extends Fragment {
                 TimePickerFragment dialog = TimePickerFragment.newInstance(mCrime.getDate());
                 dialog.setTargetFragment(CrimeFragment.this, REQUEST_TIME);
                 dialog.show(fragmentManager, DIALOG_TIME);
+            }
+        });
+
+        mRemoveCrime = v.findViewById(R.id.remove_crime_button);
+        mRemoveCrime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                CrimeLab.get(getActivity()).removeCrime(mCrime.getId());
+                getActivity().finish();
             }
         });
 
