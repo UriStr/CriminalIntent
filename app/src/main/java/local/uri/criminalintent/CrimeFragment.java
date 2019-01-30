@@ -55,6 +55,12 @@ public class CrimeFragment extends Fragment {
         mCrime = CrimeLab.get(getActivity()).getCrime(crimeId);
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        CrimeLab.get(getActivity()).updateCrime(mCrime);
+    }
 
     @Nullable
     @Override
@@ -127,7 +133,7 @@ public class CrimeFragment extends Fragment {
         mRemoveCrime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                CrimeLab.get(getActivity()).removeCrime(mCrime.getId());
+                CrimeLab.get(getActivity()).removeCrime(mCrime);
                 getActivity().finish();
             }
         });
