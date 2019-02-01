@@ -10,6 +10,7 @@ public class Crime {
     private String mDescription;
     private Date mDate;
     private boolean mSolved;
+    private String mSuspect;
 
 
     public Crime() {
@@ -24,6 +25,14 @@ public class Crime {
 
     public UUID getId() {
         return mId;
+    }
+
+    public String getSuspect() {
+        return mSuspect;
+    }
+
+    public void setSuspect(String suspect) {
+        mSuspect = suspect;
     }
 
     public String getTitle() {
