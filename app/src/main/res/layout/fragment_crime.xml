@@ -50,6 +50,7 @@
             android:layout_marginRight="16dp"
             />
 
+
     </LinearLayout>
 
     <Button
@@ -69,5 +70,11 @@
         android:layout_height="wrap_content"
         android:id="@+id/crime_report"
         android:text="@string/crime_report_text"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/makeCall"
+        android:text="@string/call_the_suspect"/>
 
 </LinearLayout>
