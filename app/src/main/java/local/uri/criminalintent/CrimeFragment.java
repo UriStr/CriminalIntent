@@ -35,6 +35,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import java.io.File;
+import java.security.Permissions;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
@@ -210,7 +211,14 @@ public class CrimeFragment extends Fragment {
         mSuspectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivityForResult(pickContract, REQUEST_CONTACT);
+                int permissionStatus = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_CONTACTS);
+
+                if (permissionStatus != PackageManager.PERMISSION_GRANTED) {
+                    //ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_CONTACTS}, REQUEST_READ_CONTACTS);
+                    requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, REQUEST_READ_CONTACTS);
+                } else {
+                    startActivityForResult(pickContract, REQUEST_CONTACT);
+                }
             }
         });
 
@@ -218,14 +226,7 @@ public class CrimeFragment extends Fragment {
         mCallSuspect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                int permissionStatus = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_CONTACTS);
-
-                if (permissionStatus != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_CONTACTS}, REQUEST_READ_CONTACTS);
-                } else {
-                    makeCall();
-                }
+                makeCall();
             }
         });
 
@@ -289,6 +290,15 @@ public class CrimeFragment extends Fragment {
 
 
         return v;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == REQUEST_READ_CONTACTS && grantResults.length >=1) {
+            startActivityForResult(new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI), REQUEST_CONTACT);
+        }
     }
 
     private void updateDate() {
