@@ -13,7 +13,6 @@ import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.ShareCompat;
@@ -22,7 +21,6 @@ import android.support.v4.content.FileProvider;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,8 +33,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import java.io.File;
-import java.security.Permissions;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
 
@@ -44,9 +40,7 @@ public class CrimeFragment extends Fragment {
 
     private static final String ARG_CRIME_ID = "crimeId";
     private static final String DIALOG_DATE = "DialogDate";
-    private static final String DIALOG_TIME = "DialogTime";
     private static final int REQUEST_DATE = 0;
-    private static final int REQUEST_TIME = 1;
     private static final int REQUEST_CONTACT = 2;
     private static final int REQUEST_READ_CONTACTS = 3;
     private static final int REQUEST_PHOTO = 4;
@@ -56,7 +50,6 @@ public class CrimeFragment extends Fragment {
     private EditText mTitleField;
     private EditText mDescField;
     private Button mDataButton;
-    private Button mTimeButton;
     private CheckBox mSolvedCheckBox;
     private Button mRemoveCrime;
     private Button mReportButton;
@@ -99,8 +92,6 @@ public class CrimeFragment extends Fragment {
 
         if (mCrime.getSuspectId() != null) {
             mContactId = mCrime.getSuspectId();
-            Log.i("TAGTAGTAG", "FROMLAUNCH contactIId:" + mContactId);
-
         }
 
         mTitleField = (EditText) v.findViewById(R.id.crime_title);
@@ -148,20 +139,9 @@ public class CrimeFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 FragmentManager fragmentManager = getFragmentManager();
-                DatePickerfragment dialog = DatePickerfragment.newInstance(mCrime.getDate());
+                DatePickerfragment dialog = DatePickerfragment.newInstance(mCrime.getDate(), REQUEST_DATE);
                 dialog.setTargetFragment(CrimeFragment.this, REQUEST_DATE);
                 dialog.show(fragmentManager, DIALOG_DATE);
-            }
-        });
-
-        mTimeButton = (Button) v.findViewById(R.id.setTimeButton);
-        mTimeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                FragmentManager fragmentManager = getFragmentManager();
-                TimePickerFragment dialog = TimePickerFragment.newInstance(mCrime.getDate());
-                dialog.setTargetFragment(CrimeFragment.this, REQUEST_TIME);
-                dialog.show(fragmentManager, DIALOG_TIME);
             }
         });
 
@@ -187,13 +167,6 @@ public class CrimeFragment extends Fragment {
         mReportButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*Intent i = new Intent(Intent.ACTION_SEND);
-                i.setType("text/plain");
-                i.putExtra(Intent.EXTRA_TEXT, getCrimeReport());
-                i.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.crime_report_subject));
-                i = Intent.createChooser(i, getString(R.string.send_report));
-                startActivity(i);*/
-
                 Intent i = ShareCompat.IntentBuilder.from(getActivity())
                         .setType("text/plain")
                         .setText(getCrimeReport())
@@ -288,7 +261,6 @@ public class CrimeFragment extends Fragment {
         });
 
 
-
         return v;
     }
 
@@ -315,16 +287,7 @@ public class CrimeFragment extends Fragment {
             Date date = (Date) data.getSerializableExtra(DatePickerfragment.EXTRA_DATE);
             mCrime.setDate(date);
             updateDate();
-        }
-
-        if (requestCode == REQUEST_TIME) {
-            int[] time = data.getIntArrayExtra(TimePickerFragment.EXTRA_TIME);
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(mCrime.getDate());
-            calendar.set(Calendar.HOUR_OF_DAY, time[0]);
-            calendar.set(Calendar.MINUTE, time[1]);
-            mCrime.setDate(calendar.getTime());
-            updateDate();
+            return;
         }
 
         if (requestCode == REQUEST_CONTACT && data != null) {
@@ -357,10 +320,13 @@ public class CrimeFragment extends Fragment {
                 c.close();
                 cc.close();
             }
+
+            return;
         }
 
         if (requestCode == REQUEST_PHOTO) {
             updatePhotoView();
+            return;
         }
     }
 
@@ -389,29 +355,12 @@ public class CrimeFragment extends Fragment {
 
     }
 
-    /*@Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case REQUEST_READ_CONTACTS:
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    makeCall();
-                } else {
-                    Toast.makeText(super.getActivity().getApplicationContext(), "Denied", Toast.LENGTH_SHORT).show();
-                }
-                return;
-        }
-    }*/
-
     private void makeCall() {
         Cursor c = getActivity().getContentResolver()
                 .query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
                         ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = " + mContactId,
                         null, null);
         c.moveToFirst();
-        Log.i("TAGTAGTAG", "size:" + Integer.toString(c.getCount()));
-        Log.i("TAGTAGTAG", "contactIId:" + mContactId);
         String number = c.getString(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
         c.close();
 

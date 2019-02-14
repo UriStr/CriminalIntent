@@ -3,10 +3,10 @@ package local.uri.criminalintent;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,12 +20,16 @@ public class DatePickerfragment extends DialogFragment {
 
     private static final String ARG_DATE = "date";
     public static final String EXTRA_DATE = "local.uri.criminalinent.date";
+    private static final String DIALOG_TIME = "DialogTime";
+    private static int dataRequestCodeFromCrimeFragment;
 
     private DatePicker mDatePicker;
 
-    public static DatePickerfragment newInstance(Date date) {
+    public static DatePickerfragment newInstance(Date date, int dataRequestCode) {
         Bundle args = new Bundle();
         args.putSerializable(ARG_DATE, date);
+
+        dataRequestCodeFromCrimeFragment = dataRequestCode;
 
         DatePickerfragment fragment = new DatePickerfragment();
         fragment.setArguments(args);
@@ -43,6 +47,7 @@ public class DatePickerfragment extends DialogFragment {
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
+        final long time = calendar.getTimeInMillis();
 
         View v = LayoutInflater.from(getActivity())
                 .inflate(R.layout.dialog_date, null);
@@ -60,6 +65,7 @@ public class DatePickerfragment extends DialogFragment {
                         int month = mDatePicker.getMonth();
                         int day = mDatePicker.getDayOfMonth();
                         Date date = new GregorianCalendar(year, month, day).getTime();
+                        date.setTime(time);
                         sendResult(Activity.RESULT_OK, date);
                     }
                 })
@@ -71,10 +77,9 @@ public class DatePickerfragment extends DialogFragment {
             return;
         }
 
-        Intent intent = new Intent();
-        intent.putExtra(EXTRA_DATE, date);
-
-        getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, intent);
-
+        FragmentManager fragmentManager = getFragmentManager();
+        TimePickerFragment dialog = TimePickerFragment.newInstance(date, EXTRA_DATE);
+        dialog.setTargetFragment(getTargetFragment(), dataRequestCodeFromCrimeFragment);
+        dialog.show(fragmentManager, DIALOG_TIME);
     }
 }

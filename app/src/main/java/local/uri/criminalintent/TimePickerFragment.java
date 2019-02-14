@@ -20,13 +20,15 @@ public class TimePickerFragment extends DialogFragment {
 
     private TimePicker mTimePicker;
 
-    private static final String ARG_TIME = "time";
-    public static final String EXTRA_TIME = "local.uri.criminalinent.time";
+    private static final String ARG_DATE = "time";
+    private static String argumentNameForDataFromDatePicker;
 
 
-    public static TimePickerFragment newInstance(Date date) {
+    public static TimePickerFragment newInstance(Date date, String argumentNameForData) {
         Bundle args = new Bundle();
-        args.putSerializable(ARG_TIME, date);
+        args.putSerializable(ARG_DATE, date);
+
+        argumentNameForDataFromDatePicker = argumentNameForData;
 
         TimePickerFragment fragment = new TimePickerFragment();
         fragment.setArguments(args);
@@ -37,8 +39,8 @@ public class TimePickerFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
-        Date date = (Date) getArguments().getSerializable(ARG_TIME);
-        Calendar calendar = Calendar.getInstance();
+        final Date date = (Date) getArguments().getSerializable(ARG_DATE);
+        final Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         int hours = calendar.get(Calendar.HOUR_OF_DAY);
         int minutes = calendar.get(Calendar.MINUTE);
@@ -46,12 +48,13 @@ public class TimePickerFragment extends DialogFragment {
         View v = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_time, null);
 
         mTimePicker = v.findViewById(R.id.dialog_time_time_picker);
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            mTimePicker.setCurrentHour(hours);
-            mTimePicker.setCurrentMinute(minutes);
-        } else {
+
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
             mTimePicker.setHour(hours);
             mTimePicker.setMinute(minutes);
+        } else {
+            mTimePicker.setCurrentHour(hours);
+            mTimePicker.setCurrentMinute(minutes);
         }
 
         return new AlertDialog.Builder(getActivity())
@@ -69,22 +72,23 @@ public class TimePickerFragment extends DialogFragment {
                             minutes = mTimePicker.getMinute();
                         }
 
-                        int[] time = {hours, minutes};
+                        calendar.set(Calendar.HOUR_OF_DAY, hours);
+                        calendar.set(Calendar.MINUTE, minutes);
+                        date.setTime(calendar.getTimeInMillis());
 
-                        sendResult(Activity.RESULT_OK, time);
-
+                        sendResult(Activity.RESULT_OK, date);
                     }
                 })
                 .create();
     }
 
-    private void sendResult(int resultCode, int[] time) {
+    private void sendResult(int resultCode, Date date) {
         if (getTargetFragment() == null) {
             return;
         }
 
         Intent intent = new Intent();
-        intent.putExtra(EXTRA_TIME, time);
+        intent.putExtra(argumentNameForDataFromDatePicker, date);
 
         getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, intent);
     }

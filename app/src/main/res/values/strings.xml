@@ -31,5 +31,7 @@
     <string name="call_the_suspect">Call the suspect</string>
 
     <string name="file_provider_authority" translatable="false">local.uri.criminalIntent.fileprovider</string>
+    <string name="call">Call</string>
+    <string name="remove">Remove</string>
 
 </resources>

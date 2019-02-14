@@ -3,7 +3,8 @@
     android:orientation="horizontal" android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginLeft="16dp"
-    android:layout_marginTop="16dp">
+    android:layout_marginTop="16dp"
+    android:layout_marginRight="16dp">
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -37,11 +38,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/crime_title_label"
+            android:textSize="20dp"
+            android:textAlignment="center"
             style="?android:listSeparatorTextViewStyle"/>
 
         <EditText
             android:id="@+id/crime_title"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/crime_title_hint" />
 
