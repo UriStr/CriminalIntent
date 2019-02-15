@@ -2,6 +2,9 @@ package local.uri.criminalintent;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.DialogFragment;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -149,8 +152,26 @@ public class CrimeFragment extends Fragment {
         mRemoveCrime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                CrimeLab.get(getActivity()).removeCrime(mCrime);
-                getActivity().finish();
+
+                AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getContext());
+                alertBuilder
+                        .setTitle("Remove crime?")
+                        .setMessage("This action can't be undone. Proceed?")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                CrimeLab.get(getActivity()).removeCrime(mCrime);
+                                getActivity().finish();
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                            }
+                        })
+                        .create();
+                alertBuilder.show();
             }
         });
 
