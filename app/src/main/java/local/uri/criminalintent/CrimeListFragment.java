@@ -122,6 +122,7 @@ public class CrimeListFragment extends Fragment {
         }
 
         updateSubtitle();
+
     }
 
     private class CrimeHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -228,7 +229,6 @@ public class CrimeListFragment extends Fragment {
                 CrimeLab.get(getActivity()).addCrime(crime);
                 /*Intent intent = CrimePagerActivity.newIntent(getActivity(), crime.getId());
                 startActivity(intent);*/
-                updateUI();
                 mCallbacks.onCrimeSelected(crime);
                 return true;
 

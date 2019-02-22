@@ -110,7 +110,7 @@ public class CrimeFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable final ViewGroup container, @Nullable Bundle savedInstanceState) {
         final View v = inflater.inflate(R.layout.fragment_crime, container, false);
 
         if (mCrime.getSuspectId() != null) {
@@ -182,7 +182,7 @@ public class CrimeFragment extends Fragment {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 CrimeLab.get(getActivity()).removeCrime(mCrime);
-                                if (v.findViewById(R.id.detail_fragment_container) == null) {
+                                if (container.findViewById(R.id.detail_fragment_container) == null) {
                                     getActivity().finish();
                                 } else {
                                     getActivity().getSupportFragmentManager().beginTransaction()

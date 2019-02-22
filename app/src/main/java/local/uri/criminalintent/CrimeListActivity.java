@@ -26,6 +26,8 @@ public class CrimeListActivity extends SingleFragmentActivity implements CrimeLi
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.detail_fragment_container, newDetail)
                     .commit();
+            CrimeListFragment c = (CrimeListFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+            c.updateUI();
         }
     }
 
