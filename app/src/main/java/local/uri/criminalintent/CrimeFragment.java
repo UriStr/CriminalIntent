@@ -4,6 +4,8 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DialogFragment;
+import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -62,6 +64,24 @@ public class CrimeFragment extends Fragment {
     private ImageButton mPhotoButton;
     private ImageView mPhotoView;
     private File mPhotoFile;
+    private Callbacks mCallbacks;
+
+    public interface Callbacks {
+        void onCrimeUpdated(Crime crime);
+    }
+
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mCallbacks = (Callbacks) context;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mCallbacks = null;
+    }
 
     public static CrimeFragment newInstance(UUID crimeId) {
         Bundle args = new Bundle();
@@ -91,7 +111,7 @@ public class CrimeFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_crime, container, false);
+        final View v = inflater.inflate(R.layout.fragment_crime, container, false);
 
         if (mCrime.getSuspectId() != null) {
             mContactId = mCrime.getSuspectId();
@@ -108,6 +128,7 @@ public class CrimeFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 mCrime.setTitle(charSequence.toString());
+                updateCrime();
             }
 
             @Override
@@ -161,7 +182,13 @@ public class CrimeFragment extends Fragment {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 CrimeLab.get(getActivity()).removeCrime(mCrime);
-                                getActivity().finish();
+                                if (v.findViewById(R.id.detail_fragment_container) == null) {
+                                    getActivity().finish();
+                                } else {
+                                    getActivity().getSupportFragmentManager().beginTransaction()
+                                            .replace(R.id.detail_fragment_container, new EmptyFragmentForTablet()).commit();
+                                    updateCrime();
+                                }
                             }
                         })
                         .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -181,6 +208,7 @@ public class CrimeFragment extends Fragment {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 mCrime.setSolved(b);
+                updateCrime();
             }
         });
 
@@ -307,6 +335,7 @@ public class CrimeFragment extends Fragment {
         if (requestCode == REQUEST_DATE) {
             Date date = (Date) data.getSerializableExtra(DatePickerfragment.EXTRA_DATE);
             mCrime.setDate(date);
+            updateCrime();
             updateDate();
             return;
         }
@@ -329,6 +358,7 @@ public class CrimeFragment extends Fragment {
 
                 String suspect = c.getString(0);
                 mCrime.setSuspect(suspect);
+                updateCrime();
                 mSuspectButton.setText(suspect);
                 mCallSuspect.setEnabled(true);
 
@@ -346,6 +376,7 @@ public class CrimeFragment extends Fragment {
         }
 
         if (requestCode == REQUEST_PHOTO) {
+            updateCrime();
             updatePhotoView();
             return;
         }
@@ -397,6 +428,11 @@ public class CrimeFragment extends Fragment {
             Bitmap bitmap = PictureUtils.getScaledBitmap(mPhotoFile.getPath(), mPhotoView.getWidth(), mPhotoView.getHeight());
             mPhotoView.setImageBitmap(bitmap);
         }
+    }
+
+    private void updateCrime() {
+        CrimeLab.get(getActivity()).updateCrime(mCrime);
+        mCallbacks.onCrimeUpdated(mCrime);
     }
 
 }
